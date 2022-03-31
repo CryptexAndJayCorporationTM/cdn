@@ -70,7 +70,7 @@ async fn get_file(Path(filename): Path<String>) -> Result<Response<BoxBody>, Sta
 
     let file = fs::read(path)
         .await
-        .map_err(|e| match e {
+        .map_err(|e| match e.kind() {
             NotFound => StatusCode::NOT_FOUND,
             _ => StatusCode::INTERNAL_SERVER_ERROR
         })?;
@@ -97,7 +97,7 @@ async fn delete_file(Path(filename): Path<String>) -> Result<Json<Value>, Status
 
     fs::remove_file(path)
         .await
-        .map_err(|e| match e {
+        .map_err(|e| match e.kind() {
             NotFound => StatusCode::NOT_FOUND,
             _ => StatusCode::INTERNAL_SERVER_ERROR
         })?;
