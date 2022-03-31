@@ -82,7 +82,7 @@ async fn get_file(Path(filename): Path<String>) -> Result<Response<BoxBody>, Sta
                     .as_str(),
             ).unwrap_or_else(|_| HeaderValue::from_static("application/octet-stream")),
         )
-        .body(body::boxed(BoxBody::Full::from(file)))
+        .body(body::boxed(body::Full::from(file)))
         .unwrap_or_else(|e| unreachable!("{e:?}"));
 
     Ok(resp)
