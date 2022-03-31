@@ -22,7 +22,7 @@ async fn index() -> Json<Value> {
 }
 
 async fn upload_file(
-    TypedHeader(authorization): TypedHeader<Authorization>,
+    TypedHeader(authorization): TypedHeader<Authorization<String>>,
     mut multipart: Multipart,
 ) -> Result<Json<Value>, StatusCode> {
     if authorization != "aaa" {
