@@ -2,13 +2,14 @@ use axum::body::{self, BoxBody};
 use axum::extract::{Multipart, Path, TypedHeader};
 use axum::headers::{Authorization, authorization::Basic};
 use axum::http::{header::CONTENT_TYPE, HeaderValue, StatusCode};
-use axum::response::Json;
+use axum::response::{Json, Response};
 use axum::routing::{delete, get, post};
 use axum::Router;
 
+use futures::stream::StreamExt;
 use serde_json::{json, Value};
 
-use mine_guess::from_path;
+use mime_guess::from_path;
 
 use std::io::ErrorKind::AlreadyExists;
 use std::net::SocketAddr;
@@ -16,37 +17,33 @@ use std::net::SocketAddr;
 use tokio::fs;
 
 async fn index() -> Json<Value> {
-    json!({
+    Json(json!({
         "message": "Hello, World!"
-    })
+    }))
 }
 
 async fn upload_file(
     TypedHeader(authorization): TypedHeader<Authorization<Basic>>,
     mut multipart: Multipart,
 ) -> Result<Json<Value>, StatusCode> {
-    if authorization != "aaa" {
-        Err(StatusCode::Unauthorized)
+    if authorization != Authorization::Basic("aaa".to_string()) {
+        return Err(StatusCode::UNAUTHORIZED);
     }
 
     if let Ok(Some(mut field)) = multipart.next_field().await {
-        if let Some(filename) = field.filename {
+        if let Some(filename) = field.file_name {
             let path = format!("/home/services/cdn/uploads/{}", filename);
-
-            let mut file = fs::File::create(path)
-                .await
-                .map_err(|_| StatusCode::InternalServerError)?;
 
             let mut buffer: Vec<u8> = Vec::new();
             let mut file_size: u64 = 0;
 
             while let Some(chunk) = field.next().await {
-                let data = chunk.map_err(|_| StatusCode::InternalServerError)?;
+                let data = chunk.map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
 
                 file_size += data.len() as u64;
 
                 if file_size > 10 * 1024 * 1024 {
-                    return Err(StatusCode::RequestEntityTooLarge);
+                    return Err(StatusCode::REQUEST_ENTITY_TOO_LARGE);
                 }
 
                 buffer.extend_from_slice(&data);
@@ -54,25 +51,25 @@ async fn upload_file(
 
             fs::write(filename, &buffer[..])
                 .await
-                .map_err(|_| StatusCode::InternalServerError)?;
+                .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
 
-            Ok(json!({
+            return Ok(Json(json!({
                 "message": "File uploaded"
-            }))
+            })));
         } else {
-            Err(StatusCode::BadRequest)
+            return Err(StatusCode::BAD_REQUEST);
         }
     }
 
-    Err(StatusCode::BadRequest)
+    Err(StatusCode::BAD_REQUEST)
 }
 
-async fn get_file(Path(filename): String) -> Result<Response<BoxBody>, StatusCode> {
+async fn get_file(Path(filename): Path<String>) -> Result<Response<BoxBody>, StatusCode> {
     let path = format!("/home/services/cdn/uploads/{}", filename);
 
     let file = fs::read(path)
         .await
-        .map_err(|_| StatusCode::InternalServerError)?;
+        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
 
     let resp = Response::builder()
         .status(StatusCode::OK)
@@ -91,22 +88,22 @@ async fn get_file(Path(filename): String) -> Result<Response<BoxBody>, StatusCod
     Ok(resp)
 }
 
-async fn delete_file(Path(filename): String) -> Result<Json<Value>, StatusCode> {
+async fn delete_file(Path(filename): Path<String>) -> Result<Json<Value>, StatusCode> {
     let path = format!("/home/services/cdn/uploads/{}", filename);
 
     fs::remove_file(path)
         .await
-        .map_err(|_| StatusCode::InternalServerError)?;
+        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
 
-    Ok(json!({
+    Ok(Json(json!({
         "message": "File deleted"
-    }))
+    })))
 }
 
 #[tokio::main]
 async fn main() {
     let _ =
-        fs::create_dir_all("/home/services/cdn/uploads".to_string()).map_err(|e| match e.kind() {
+        fs::create_dir_all("/home/services/cdn/uploads".to_string()).await.map_err(|e| match e.kind() {
             AlreadyExists => (),
             _ => panic!("{e:?}"),
         });
