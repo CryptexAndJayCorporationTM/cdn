@@ -11,7 +11,7 @@ use serde_json::{json, Value};
 
 use mime_guess::from_path;
 
-use std::io::ErrorKind::AlreadyExists;
+use std::io::ErrorKind::{AlreadyExists, NotFound};
 use std::net::SocketAddr;
 
 use tokio::fs;
@@ -70,7 +70,10 @@ async fn get_file(Path(filename): Path<String>) -> Result<Response<BoxBody>, Sta
 
     let file = fs::read(path)
         .await
-        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+        .map_err(|e| match e {
+            NotFound => StatusCode::NOT_FOUND,
+            _ => StatusCode::INTERNAL_SERVER_ERROR
+        })?;
 
     let resp = Response::builder()
         .status(StatusCode::OK)
@@ -94,7 +97,10 @@ async fn delete_file(Path(filename): Path<String>) -> Result<Json<Value>, Status
 
     fs::remove_file(path)
         .await
-        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+        .map_err(|e| match e {
+            NotFound => StatusCode::NOT_FOUND,
+            _ => StatusCode::INTERNAL_SERVER_ERROR
+        })?;
 
     Ok(Json(json!({
         "message": "File deleted"
