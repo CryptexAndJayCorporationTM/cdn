@@ -1,6 +1,6 @@
 use axum::body::{self, BoxBody};
 use axum::extract::{Multipart, Path, TypedHeader};
-use axum::headers::{Authorization, ContentType};
+use axum::headers::{Authorization, authorization::Basic};
 use axum::http::{header::CONTENT_TYPE, HeaderValue, StatusCode};
 use axum::response::Json;
 use axum::routing::{delete, get, post};
@@ -22,7 +22,7 @@ async fn index() -> Json<Value> {
 }
 
 async fn upload_file(
-    TypedHeader(authorization): TypedHeader<Authorization<String>>,
+    TypedHeader(authorization): TypedHeader<Authorization<Basic>>,
     mut multipart: Multipart,
 ) -> Result<Json<Value>, StatusCode> {
     if authorization != "aaa" {
