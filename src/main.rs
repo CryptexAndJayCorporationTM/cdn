@@ -31,8 +31,7 @@ async fn upload_file(
     }
 
     if let Ok(Some(mut field)) = multipart.next_field().await {
-        if field.file_name().is_some() {
-            let filename = field.file_name().unwrap_or_else(|| unreachable!());
+        if let Some(filename) = field.clone().file_name() {
             let path = format!("/home/services/cdn/uploads/{}", filename);
 
             let mut buffer: Vec<u8> = Vec::new();
