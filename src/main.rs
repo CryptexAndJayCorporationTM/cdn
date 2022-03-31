@@ -32,6 +32,7 @@ async fn upload_file(
 
     if let Ok(Some(mut field)) = multipart.next_field().await {
         if field.file_name().is_some() {
+            let filename = field.file_name().unwrap_or_else(|| unreachable!());
             let path = format!("/home/services/cdn/uploads/{}", filename);
 
             let mut buffer: Vec<u8> = Vec::new();
@@ -49,7 +50,7 @@ async fn upload_file(
                 buffer.extend_from_slice(&data);
             }
 
-            fs::write(field.file_name().unwrap_or_else(|| unreachable!()), &buffer[..])
+            fs::write(filename, &buffer[..])
                 .await
                 .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
 
