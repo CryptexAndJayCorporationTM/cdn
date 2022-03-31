@@ -26,12 +26,12 @@ async fn upload_file(
     TypedHeader(authorization): TypedHeader<Authorization<Basic>>,
     mut multipart: Multipart,
 ) -> Result<Json<Value>, StatusCode> {
-    if authorization != Authorization::Basic("aaa".to_string()) {
+    if authorization != Authorization::basic("aaa".to_string()) {
         return Err(StatusCode::UNAUTHORIZED);
     }
 
     if let Ok(Some(mut field)) = multipart.next_field().await {
-        if let Some(filename) = field.file_name {
+        if let Some(filename) = field.file_name() {
             let path = format!("/home/services/cdn/uploads/{}", filename);
 
             let mut buffer: Vec<u8> = Vec::new();
@@ -43,7 +43,7 @@ async fn upload_file(
                 file_size += data.len() as u64;
 
                 if file_size > 10 * 1024 * 1024 {
-                    return Err(StatusCode::REQUEST_ENTITY_TOO_LARGE);
+                    return Err(StatusCode::PAYLOAD_TOO_LARGE);
                 }
 
                 buffer.extend_from_slice(&data);
@@ -80,9 +80,9 @@ async fn get_file(Path(filename): Path<String>) -> Result<Response<BoxBody>, Sta
                     .first_or_octet_stream()
                     .to_string()
                     .as_str(),
-            ),
+            ).unwrap_or_else(|_| HeaderValue::from_static("application/octet-stream")),
         )
-        .body(body::boxed(BoxBody::from(file)))
+        .body(body::boxed(BoxBody::Full::from(file)))
         .unwrap_or_else(|e| unreachable!("{e:?}"));
 
     Ok(resp)
