@@ -26,7 +26,7 @@ async fn upload_file(
     TypedHeader(authorization): TypedHeader<Authorization<Bearer>>,
     mut multipart: Multipart,
 ) -> Result<Json<Value>, StatusCode> {
-    if authorization.token != "aaa" {
+    if authorization.token() != "aaa" {
         return Err(StatusCode::UNAUTHORIZED);
     }
 
