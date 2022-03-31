@@ -6,6 +6,8 @@ use axum::response::{Json, Response};
 use axum::routing::{delete, get, post};
 use axum::Router;
 
+use dotenv::dotenv;
+
 use futures::stream::StreamExt;
 use serde_json::{json, Value};
 
@@ -13,6 +15,7 @@ use mime_guess::from_path;
 
 use std::io::ErrorKind::{AlreadyExists, NotFound};
 use std::net::SocketAddr;
+use std::env;
 
 use tokio::fs;
 
@@ -26,7 +29,7 @@ async fn upload_file(
     TypedHeader(authorization): TypedHeader<Authorization<Bearer>>,
     mut multipart: Multipart,
 ) -> Result<Json<Value>, StatusCode> {
-    if authorization.token() != "aaa" {
+    if authorization.token() != env!("AUTH_TOKEN") {
         return Err(StatusCode::UNAUTHORIZED);
     }
 
@@ -109,6 +112,8 @@ async fn delete_file(Path(filename): Path<String>) -> Result<Json<Value>, Status
 
 #[tokio::main]
 async fn main() {
+    dotenv();
+
     let _ =
         fs::create_dir_all("/home/services/cdn/uploads".to_string()).await.map_err(|e| match e.kind() {
             AlreadyExists => (),
