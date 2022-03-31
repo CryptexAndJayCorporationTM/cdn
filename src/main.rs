@@ -50,7 +50,7 @@ async fn upload_file(
                 buffer.extend_from_slice(&data);
             }
 
-            fs::write(filename, &buffer[..])
+            fs::write(path, &buffer[..])
                 .await
                 .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
 
