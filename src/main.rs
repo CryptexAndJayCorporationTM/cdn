@@ -30,7 +30,7 @@ async fn upload_file(
     TypedHeader(authorization): TypedHeader<Authorization<Bearer>>,
     mut multipart: Multipart,
 ) -> Result<Json<Value>, StatusCode> {
-    if authorization.token() != std::env::var("AUTH_TOKEN").unwrap_or_else(|_| "aaa") {
+    if authorization.token() != std::env::var("AUTH_TOKEN").unwrap_or_else(|_| "aaa".to_string()).as_str() {
         return Err(StatusCode::UNAUTHORIZED);
     }
 
