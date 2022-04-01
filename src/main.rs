@@ -94,6 +94,10 @@ async fn upload_file(
                 buffer.extend_from_slice(&data);
             }
 
+            fs::create_dir_all(path.parent().unwrap())
+                .await
+                .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+
             fs::write(path, &buffer[..])
                 .await
                 .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
