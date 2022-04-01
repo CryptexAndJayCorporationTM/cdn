@@ -113,7 +113,7 @@ async fn delete_file(Path(filename): Path<String>) -> Result<Json<Value>, Status
 
 #[tokio::main]
 async fn main() {
-    dotenv();
+    dotenv().ok();
 
     tracing_subscriber::fmt::init();
 
