@@ -142,14 +142,6 @@ async fn get_file(Path(filename): Path<String>) -> Result<Response<BoxBody>, Sta
     handle_get_file(filename, path).await
 }
 
-async fn get_file_with_dir(
-    Path((dir, filename)): Path<(String, String)>,
-) -> Result<Response<BoxBody>, StatusCode> {
-    let path = format!("/home/services/cdn/uploads/{}/{}", dir, filename);
-
-    handle_get_file(filename, path).await
-}
-
 async fn handle_delete_file(path: String) -> Result<Json<Value>, StatusCode> {
     fs::remove_file(path).await.map_err(|e| match e.kind() {
         NotFound => StatusCode::NOT_FOUND,
@@ -163,14 +155,6 @@ async fn handle_delete_file(path: String) -> Result<Json<Value>, StatusCode> {
 
 async fn delete_file(Path(filename): Path<String>) -> Result<Json<Value>, StatusCode> {
     let path = format!("/home/services/cdn/uploads/{}", filename);
-
-    handle_delete_file(path).await
-}
-
-async fn delete_file_with_dir(
-    Path((dir, filename)): Path<(String, String)>,
-) -> Result<Json<Value>, StatusCode> {
-    let path = format!("/home/services/cdn/uploads/{}/{}", dir, filename);
 
     handle_delete_file(path).await
 }
@@ -196,11 +180,7 @@ async fn main() {
     let router = Router::new()
         .route("/", get(index))
         .route("/upload", post(upload_file))
-        .route("/uploads/:filename", get(get_file).delete(delete_file))
-        .route(
-            "/uploads/:dir/:filename",
-            get(get_file_with_dir).delete(delete_file_with_dir),
-        ) 
+        .route("/uploads/*filename", get(get_file).delete(delete_file))
         .layer(TraceLayer::new_for_http());
 
     let addr = SocketAddr::from(([0, 0, 0, 0], 8083));
