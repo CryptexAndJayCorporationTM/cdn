@@ -6,7 +6,7 @@ use axum::response::{Json, Response};
 use axum::routing::{delete, get, post};
 use axum::Router;
 
-use tower_http::tracing::TraceLayer;
+use tower_http::trace::TraceLayer;
 
 use dotenv::dotenv;
 
@@ -17,7 +17,6 @@ use mime_guess::from_path;
 
 use std::io::ErrorKind::{AlreadyExists, NotFound};
 use std::net::SocketAddr;
-use std::env;
 
 use tokio::fs;
 
@@ -31,7 +30,7 @@ async fn upload_file(
     TypedHeader(authorization): TypedHeader<Authorization<Bearer>>,
     mut multipart: Multipart,
 ) -> Result<Json<Value>, StatusCode> {
-    if authorization.token() != env!("AUTH_TOKEN") {
+    if authorization.token() != std::env::var("AUTH_TOKEN").unwrap_or_else(|_| "aaa") {
         return Err(StatusCode::UNAUTHORIZED);
     }
 
