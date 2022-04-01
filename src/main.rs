@@ -6,6 +6,8 @@ use axum::response::{Json, Response};
 use axum::routing::{delete, get, post};
 use axum::Router;
 
+use tower_http::tracing::TraceLayer;
+
 use dotenv::dotenv;
 
 use futures::stream::StreamExt;
@@ -114,6 +116,9 @@ async fn delete_file(Path(filename): Path<String>) -> Result<Json<Value>, Status
 async fn main() {
     dotenv();
 
+    tracing_subscriber::fmt::init();
+
+
     let _ =
         fs::create_dir_all("/home/services/cdn/uploads".to_string()).await.map_err(|e| match e.kind() {
             AlreadyExists => (),
@@ -124,7 +129,8 @@ async fn main() {
         .route("/", get(index))
         .route("/upload", post(upload_file))
         .route("/uploads/:filename", get(get_file))
-        .route("/uploads/:filename", delete(delete_file));
+        .route("/uploads/:filename", delete(delete_file))
+        .layer(TraceLayer::new_for_http());
 
     let addr = SocketAddr::from(([0, 0, 0, 0], 8083));
 
