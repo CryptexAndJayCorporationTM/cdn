@@ -8,6 +8,8 @@ use axum::Router;
 
 use tower_http::trace::TraceLayer;
 
+use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
+
 use dotenv::dotenv;
 
 use futures::stream::StreamExt;
@@ -115,7 +117,13 @@ async fn delete_file(Path(filename): Path<String>) -> Result<Json<Value>, Status
 async fn main() {
     dotenv().ok();
 
-    tracing_subscriber::fmt::init();
+    tracing_subscriber::registry()
+    .with(tracing_subscriber::EnvFilter::new(
+        std::env::var("RUST_LOG")
+            .unwrap_or_else(|_| "tower_http=info".into()),
+    ))
+    .with(tracing_subscriber::fmt::layer())
+    .init();
 
 
     let _ =
