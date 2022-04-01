@@ -196,11 +196,11 @@ async fn main() {
     let router = Router::new()
         .route("/", get(index))
         .route("/upload", post(upload_file))
+        .route("/uploads/:filename", get(get_file).delete(delete_file))
         .route(
             "/uploads/:dir/:filename",
             get(get_file_with_dir).delete(delete_file_with_dir),
-        )
-        .route("/uploads/:filename", get(get_file).delete(delete_file))
+        ) 
         .layer(TraceLayer::new_for_http());
 
     let addr = SocketAddr::from(([0, 0, 0, 0], 8083));
