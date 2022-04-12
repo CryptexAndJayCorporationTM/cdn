@@ -164,7 +164,7 @@ async fn get_paste(Path(filename): Path<String>) -> Result<Response<BoxBody>, St
             <html><head><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/styles/atom-one-dark.min.css">
             <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/highlight.min.js"></script><style>@import url(
             'https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700;800;900&family=JetBrains+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800&display=swap'
-            ); *{{font-family: 'Jetbrains Mono', monospace;}}body{{margin: 0; background: #282c34;}}pre{{margin: 0; padding: 16px; font-size: 14px; min-height: 100%;}}div
+            ); *{{font-family: 'Jetbrains Mono', monospace;}}body{{margin: 0; background: #282c34;color:white}}pre{{margin: 0; padding: 16px; font-size: 14px; min-height: 100%;}}div
             {{display: flex; align-items: center;}}div div{{display: flex; align-items: center; margin-left: 16px; flex-grow: 1; padding-top: 12px;}}button
             {{border: none; cursor: pointer; color: white; background-color: #14a84c; border-radius: 4px; font-size: 14px; margin: 6px; padding: 8px; min-width: 64px;
             opacity: 0.75; transition: all 0.3s ease;}}button:hover{{opacity: 1; background-color: #17bd56;}}h2{{margin: 16px 0 0 16px; font-weight: 400; 
