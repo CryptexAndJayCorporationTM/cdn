@@ -87,7 +87,7 @@ async fn upload_file(
 
                 file_size += data.len() as u64;
 
-                if file_size > 10 * 1024 * 1024 {
+                if file_size > 35 * 1024 * 1024 {
                     return Err(StatusCode::PAYLOAD_TOO_LARGE);
                 }
 
