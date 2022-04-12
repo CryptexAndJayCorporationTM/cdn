@@ -178,7 +178,7 @@ async fn get_paste(Path(filename): Path<String>) -> Result<Response<BoxBody>, St
             color: rgba(255, 255, 255, 0.3); font-size: 1.2em;}}h2, button{{-webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none;}}
             h2 #second{{color: rgba(255, 255, 255, 0.33); font-weight: 500;}}</style></head><body><div> <h2> <span id="first">Paste: </span> <span id="second"><i>{}</i></span>
             </h2> <div><button onclick="copyButton()" id="copy">Copy</button> <button onclick="copyLink()" id="copylink">Copy Link</button></div></div>
-            <pre style="word-wrap: break-word; white-space: pre-wrap;" id="o" class="highlight-{}">{}</pre><script>document.querySelectorAll('pre').forEach(el=>{{hljs.highlightElement(el);}});
+            <pre style="word-wrap: break-word; white-space: pre-wrap;" id="o" class="language-{}">{}</pre><script>document.querySelectorAll('pre').forEach(el=>{{hljs.highlightElement(el);}});
             function copy(text){{navigator.clipboard.writeText(text);}}function copyButton(){{copy(document.getElementById('o').innerText); let el=document.getElementById('copy');
             el.innerHTML='Copied!'; setTimeout(()=>{{el.innerHTML='Copy';}}, 1000);}}function copyLink(){{copy(window.location.href); let el=document.getElementById('copylink');
             el.innerHTML='Copied Link!'; setTimeout(()=>{{el.innerHTML='Copy Link';}},1000);}}</script> </body></html>
