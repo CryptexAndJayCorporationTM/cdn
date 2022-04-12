@@ -16,6 +16,7 @@ tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 dotenv = "0.15"
 tower-http = { version = "0.2", features = ["trace"] }
+html-escape = "0.2.11"
 
 [profile.release]
 lto = "fat"
