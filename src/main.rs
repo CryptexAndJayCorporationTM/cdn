@@ -136,6 +136,7 @@ async fn handle_get_file(filename: String, path: String) -> Result<Response<BoxB
             )
             .unwrap_or_else(|_| HeaderValue::from_static("application/octet-stream")),
         )
+        .header("Cache-Control", "public, max-age=31557600, immutable")
         .body(body::boxed(body::Full::from(file)))
         .unwrap_or_else(|_e| unreachable!("{_e:?}"));
 
@@ -168,7 +169,7 @@ async fn get_paste(Path(filename): Path<String>) -> Result<Response<BoxBody>, St
 
     let html = format!(
         r#"
-            <html><head><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/styles/atom-one-dark.min.css">
+            <!DOCTYPE html><html><head><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/styles/atom-one-dark.min.css">
             <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/highlight.min.js"></script><style>@import url(
             'https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800&display=swap'
             ); *{{font-family: 'Jetbrains Mono', monospace;}}body{{margin: 0; background: #282c34;color:white}}pre{{margin: 0; padding: 16px; font-size: 14px; min-height: 100%;}}div
@@ -191,6 +192,7 @@ async fn get_paste(Path(filename): Path<String>) -> Result<Response<BoxBody>, St
     let resp = Response::builder()
         .status(StatusCode::OK)
         .header(CONTENT_TYPE, HeaderValue::from_static("text/html"))
+        .header("Cache-Control", "public, max-age=31557600, immutable")
         .body(body::boxed(body::Full::from(html)))
         .unwrap_or_else(|_e| unreachable!("{_e:?}"));
 
