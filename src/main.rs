@@ -57,11 +57,8 @@ async fn upload_file(
     }
 
     if let Ok(Some(mut field)) = multipart.next_field().await {
-        if field.file_name().is_some() {
-            let filename = field
-                .file_name()
-                .unwrap_or_else(|| unreachable!())
-                .to_string();
+        if let Some(filename) = field.file_name() {
+            let filename = filename.to_string();
             let directory = directory
                 .map(|d| {
                     if d == "/" {
