@@ -19,12 +19,16 @@ use serde::Deserialize;
 use serde_json::{json, Value};
 
 use mime_guess::from_path;
+use mimalloc::MiMalloc;
 
 use std::io::ErrorKind::{AlreadyExists, NotFound};
 use std::net::SocketAddr;
 use std::path::Path as StdPath;
 
 use tokio::fs;
+
+#[global_allocator]
+static GLOBAL: MiMalloc = MiMalloc;
 
 #[derive(Deserialize)]
 struct UploadFileQuery {
