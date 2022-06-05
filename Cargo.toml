@@ -20,3 +20,4 @@ html-escape = "0.2.11"
 
 [profile.release]
 lto = "fat"
+codegen-units = 1
