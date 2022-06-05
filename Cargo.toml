@@ -6,7 +6,7 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-tokio = { version = "1.17", features = ["full"] }
+tokio = { version = "1.19", features = ["full"] }
 axum = { version = "0.5", features = ["headers", "multipart"] }
 futures = "0.3"
 serde = { version = "1", features = ["derive"] }
@@ -15,8 +15,8 @@ mime_guess = "2"
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 dotenv = "0.15"
-tower-http = { version = "0.2", features = ["trace"] }
-html-escape = "0.2.11"
+tower-http = { version = "0.3", features = ["trace"] }
+html-escape = "0.2"
 
 [profile.release]
 lto = "fat"
